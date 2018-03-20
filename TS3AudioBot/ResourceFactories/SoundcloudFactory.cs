@@ -13,8 +13,8 @@ namespace TS3AudioBot.ResourceFactories
 	using Newtonsoft.Json;
 	using Newtonsoft.Json.Linq;
 	using System;
-	using System.Drawing;
 	using System.Globalization;
+	using System.IO;
 	using System.Text.RegularExpressions;
 
 	public sealed class SoundcloudFactory : IResourceFactory, IPlaylistFactory, IThumbnailFactory
@@ -138,7 +138,7 @@ namespace TS3AudioBot.ResourceFactories
 			return plist;
 		}
 
-		public R<Image> GetThumbnail(PlayResource playResource)
+		public R<Stream> GetThumbnail(PlayResource playResource)
 		{
 			var uri = new Uri($"https://api.soundcloud.com/tracks/{playResource.BaseData.ResourceId}?client_id={SoundcloudClientId}");
 			if (!WebWrapper.DownloadString(out string jsonResponse, uri))
@@ -159,18 +159,7 @@ namespace TS3AudioBot.ResourceFactories
 			imgUrl = imgUrl.Replace("-large", "-t300x300");
 
 			var imgurl = new Uri(imgUrl);
-			Image img = null;
-			var resresult = WebWrapper.GetResponse(imgurl, (webresp) =>
-			{
-				using (var stream = webresp.GetResponseStream())
-				{
-					if (stream != null)
-						img = Image.FromStream(stream);
-				}
-			});
-			if (resresult != ValidateCode.Ok)
-				return "Error while reading image";
-			return img;
+			return WebWrapper.GetResponseUnsafe(imgurl);
 		}
 
 		public void Dispose() { }

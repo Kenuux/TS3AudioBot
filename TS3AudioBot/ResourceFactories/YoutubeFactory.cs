@@ -10,16 +10,14 @@
 namespace TS3AudioBot.ResourceFactories
 {
 	using Helper;
+	using Newtonsoft.Json;
 	using System;
 	using System.Collections.Generic;
-	using System.Collections.Specialized;
-	using System.Drawing;
 	using System.Globalization;
+	using System.IO;
 	using System.Linq;
 	using System.Text;
 	using System.Text.RegularExpressions;
-	using System.Web;
-	using Newtonsoft.Json;
 
 	public sealed class YoutubeFactory : IResourceFactory, IPlaylistFactory, IThumbnailFactory
 	{
@@ -59,7 +57,7 @@ namespace TS3AudioBot.ResourceFactories
 			var result = ResolveResourceInternal(resource);
 			if (result.Ok)
 				return result;
-			
+
 			return YoutubeDlWrapped(resource);
 		}
 
@@ -69,51 +67,46 @@ namespace TS3AudioBot.ResourceFactories
 				return "No connection to the youtube api could be established";
 
 			var videoTypes = new List<VideoData>();
-			NameValueCollection dataParse = HttpUtility.ParseQueryString(resulthtml);
+			var dataParse = ParseQueryString(resulthtml);
 
-			string videoDataUnsplit = dataParse["url_encoded_fmt_stream_map"];
-			if (videoDataUnsplit != null)
+			if (dataParse.TryGetValue("url_encoded_fmt_stream_map", out var videoDataUnsplit))
 			{
-				string[] videoData = videoDataUnsplit.Split(',');
+				string[] videoData = videoDataUnsplit[0].Split(',');
 
 				foreach (string vdat in videoData)
 				{
-					NameValueCollection videoparse = HttpUtility.ParseQueryString(vdat);
+					var videoparse = ParseQueryString(vdat);
 
-					string vLink = videoparse["url"];
-					if (vLink == null)
+					if (!videoparse.TryGetValue("url", out var vLink))
 						continue;
 
-					string vType = videoparse["type"];
-					if (vType == null)
+					if (!videoparse.TryGetValue("type", out var vType))
 						continue;
 
-					string vQuality = videoparse["quality"];
-					if (vQuality == null)
+					if (!videoparse.TryGetValue("quality", out var vQuality))
 						continue;
 
 					var vt = new VideoData()
 					{
-						Link = vLink,
-						Codec = GetCodec(vType),
-						Qualitydesciption = vQuality
+						Link = vLink[0],
+						Codec = GetCodec(vType[0]),
+						Qualitydesciption = vQuality[0]
 					};
 					videoTypes.Add(vt);
 				}
 			}
 
-			videoDataUnsplit = dataParse["adaptive_fmts"];
-			if (videoDataUnsplit != null)
+			if (dataParse.TryGetValue("adaptive_fmts", out videoDataUnsplit))
 			{
-				string[] videoData = videoDataUnsplit.Split(',');
+				string[] videoData = videoDataUnsplit[0].Split(',');
 
 				foreach (string vdat in videoData)
 				{
-					NameValueCollection videoparse = HttpUtility.ParseQueryString(vdat);
+					var videoparse = ParseQueryString(vdat);
 
-					string vType = videoparse["type"];
-					if (vType == null)
+					if (!videoparse.TryGetValue("type", out var vTypeArr))
 						continue;
+					var vType = vTypeArr[0];
 
 					bool audioOnly = false;
 					if (vType.StartsWith("video/", StringComparison.Ordinal))
@@ -121,15 +114,14 @@ namespace TS3AudioBot.ResourceFactories
 					else if (vType.StartsWith("audio/", StringComparison.Ordinal))
 						audioOnly = true;
 
-					string vLink = videoparse["url"];
-					if (vLink == null)
+					if (!videoparse.TryGetValue("url", out var vLink))
 						continue;
 
 					var vt = new VideoData()
 					{
 						Codec = GetCodec(vType),
 						Qualitydesciption = vType,
-						Link = vLink
+						Link = vLink[0]
 					};
 					if (audioOnly)
 						vt.AudioOnly = true;
@@ -152,7 +144,11 @@ namespace TS3AudioBot.ResourceFactories
 			if (!result.Ok)
 				return result.Error;
 
-			return new PlayResource(videoTypes[codec].Link, resource.ResourceTitle != null ? resource : resource.WithName(dataParse["title"] ?? $"<YT - no title : {resource.ResourceTitle}>"));
+			var title = dataParse.TryGetValue("title", out var titleArr)
+				? titleArr[0]
+				: $"<YT - no title : {resource.ResourceTitle}>";
+
+			return new PlayResource(videoTypes[codec].Link, resource.ResourceTitle != null ? resource : resource.WithName(title));
 		}
 
 		public string RestoreLink(string id) => "https://youtu.be/" + id;
@@ -248,7 +244,7 @@ namespace TS3AudioBot.ResourceFactories
 					return "Web response error";
 				var parsed = JsonConvert.DeserializeObject<JsonPlaylistItems>(response);
 				var videoItems = parsed.items;
-				YoutubePlaylistItem[] itemBuffer = new YoutubePlaylistItem[videoItems.Length];
+				var itemBuffer = new YoutubePlaylistItem[videoItems.Length];
 				for (int i = 0; i < videoItems.Length; i++)
 				{
 					itemBuffer[i] = new YoutubePlaylistItem(new AudioResource(
@@ -274,7 +270,7 @@ namespace TS3AudioBot.ResourceFactories
 
 			return plist;
 		}
-		
+
 		private static R<PlayResource> YoutubeDlWrapped(AudioResource resource)
 		{
 			Log.Debug("Falling back to youtube-dl!");
@@ -296,9 +292,8 @@ namespace TS3AudioBot.ResourceFactories
 			{
 				Uri[] uriList = urlOptions.Select(s => new Uri(s)).ToArray();
 				Uri bestMatch = uriList
-					.FirstOrDefault(u => HttpUtility.ParseQueryString(u.Query)
-						.GetValues("mime")?
-						.Any(x => x.StartsWith("audio", StringComparison.OrdinalIgnoreCase)) ?? false);
+					.FirstOrDefault(u => ParseQueryString(u.Query).TryGetValue("mime", out var mimes)
+										 && mimes.Any(x => x.StartsWith("audio", StringComparison.OrdinalIgnoreCase)));
 				url = (bestMatch ?? uriList[0]).OriginalString;
 			}
 
@@ -309,7 +304,26 @@ namespace TS3AudioBot.ResourceFactories
 			return new PlayResource(url, resource.WithName(title));
 		}
 
-		public R<Image> GetThumbnail(PlayResource playResource)
+		public static Dictionary<string, List<string>> ParseQueryString(string requestQueryString)
+		{
+			var rc = new Dictionary<string, List<string>>();
+			string[] ar1 = requestQueryString.Split('&', '?');
+			foreach (string row in ar1)
+			{
+				if (string.IsNullOrEmpty(row)) continue;
+				int index = row.IndexOf('=');
+				var param = Uri.UnescapeDataString(row.Substring(0, index));
+				if (!rc.TryGetValue(param, out var list))
+				{
+					list = new List<string>();
+					rc[param] = list;
+				}
+				list.Add(Uri.UnescapeDataString(row.Substring(index + 1)));
+			}
+			return rc;
+		}
+
+		public R<Stream> GetThumbnail(PlayResource playResource)
 		{
 			if (!WebWrapper.DownloadString(out string response,
 				new Uri($"https://www.googleapis.com/youtube/v3/videos?part=snippet&id={playResource.BaseData.ResourceId}&key={data.ApiKey}")))
@@ -320,18 +334,7 @@ namespace TS3AudioBot.ResourceFactories
 			// medium : 320px/180px
 			// high   : 480px/360px
 			var imgurl = new Uri(parsed.items[0].snippet.thumbnails.medium.url);
-			Image img = null;
-			var resresult = WebWrapper.GetResponse(imgurl, (webresp) =>
-			{
-				using (var stream = webresp.GetResponseStream())
-				{
-					if (stream != null)
-						img = Image.FromStream(stream);
-				}
-			});
-			if (resresult != ValidateCode.Ok)
-				return "Error while reading image";
-			return img;
+			return WebWrapper.GetResponseUnsafe(imgurl);
 		}
 
 		public void Dispose() { }

@@ -47,9 +47,7 @@ namespace TS3AudioBot.Helper
 				return false;
 			}
 		}
-
-		//if (request.Method == "GET")
-		//	request.Method = "HEAD";
+		
 		public static ValidateCode GetResponse(Uri link) => GetResponse(link, null);
 		public static ValidateCode GetResponse(Uri link, TimeSpan timeout) => GetResponse(link, null, timeout);
 		public static ValidateCode GetResponse(Uri link, Action<WebResponse> body) => GetResponse(link, body, DefaultTimeout);

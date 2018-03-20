@@ -50,7 +50,7 @@ public struct R<TSuccess>
 	public TSuccess Value { get; }
 
 	private R(TSuccess value) { isError = false; Error = null; if (value == null) throw new ArgumentNullException(nameof(value), "Return of ok must not be null."); Value = value; }
-	private R(string error) { isError = true; Error = error ?? throw new ArgumentNullException(nameof(error), "Error must not be null."); Value = default(TSuccess); }
+	private R(string error) { isError = true; Error = error ?? throw new ArgumentNullException(nameof(error), "Error must not be null."); Value = default; }
 	//internal R(bool isError, TSuccess value)
 
 	/// <summary>Creates a new failed result with a message</summary>
@@ -85,8 +85,8 @@ public struct R<TSuccess, TError>
 	public TError Error { get; }
 	public TSuccess Value { get; }
 
-	private R(TSuccess value) { isError = false; Error = default(TError); if (value == null) throw new ArgumentNullException(nameof(value), "Return of ok must not be null."); Value = value; }
-	private R(TError error) { isError = true; Value = default(TSuccess); if (error == null) throw new ArgumentNullException(nameof(error), "Error must not be null."); Error = error; }
+	private R(TSuccess value) { isError = false; Error = default; if (value == null) throw new ArgumentNullException(nameof(value), "Return of ok must not be null."); Value = value; }
+	private R(TError error) { isError = true; Value = default; if (error == null) throw new ArgumentNullException(nameof(error), "Error must not be null."); Error = error; }
 	internal R(bool isError, TSuccess value, TError error) { this.isError = isError; Value = value; Error = error; }
 
 	/// <summary>Creates a new failed result with an error object</summary>
@@ -138,6 +138,16 @@ public struct E<TError>
 	{
 		if (!isError && value == null) throw new ArgumentNullException(nameof(value), "Value must not be null.");
 		return new R<TSuccess, TError>(isError, value, Error);
+	}
+}
+
+public static class RExtensions
+{
+	public static R<T> AsResult<T>(this T obj, string error) where T: class 
+	{
+		if (obj == null)
+			return error;
+		return obj;
 	}
 }
 

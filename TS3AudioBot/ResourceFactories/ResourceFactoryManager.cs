@@ -14,7 +14,7 @@ namespace TS3AudioBot.ResourceFactories
 	using Sessions;
 	using System;
 	using System.Collections.Generic;
-	using System.Drawing;
+	using System.IO;
 	using System.Linq;
 	using System.Reflection;
 
@@ -185,7 +185,13 @@ namespace TS3AudioBot.ResourceFactories
 			return factory.RestoreLink(res.ResourceId);
 		}
 
-		public R<Image> GetThumbnail(PlayResource playResource)
+		/// <summary>
+		/// Retuns an associated image for this resource.
+		/// <para>IMPORTANT: You have to dispose the stream when the result is successful.</para>
+		/// </summary>
+		/// <param name="playResource">The resource to find a thumbnail for.</param>
+		/// <returns>A stream to the resulting image when successful. Error otherwise.</returns>
+		public R<Stream> GetThumbnail(PlayResource playResource)
 		{
 			var factory = GetFactoryByType<IThumbnailFactory>(playResource.BaseData.AudioType);
 			if (factory == null)

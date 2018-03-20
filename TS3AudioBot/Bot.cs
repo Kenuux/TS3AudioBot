@@ -249,11 +249,24 @@ namespace TS3AudioBot
 
 			if (e is PlayInfoEventArgs startEvent)
 			{
+#if NET46
 				var thumresult = FactoryManager.GetThumbnail(startEvent.PlayResource);
 				if (!thumresult.Ok)
 					return;
 
-				using (var bmp = ImageUtil.BuildStringImage("Now playing: " + startEvent.ResourceData.ResourceTitle, thumresult.Value))
+				System.Drawing.Image bmpOrig;
+				try
+				{
+					using(var stream = thumresult.Value)
+						bmpOrig = System.Drawing.Image.FromStream(stream);
+				}
+				catch (ArgumentException)
+				{
+					Log.Warn("Inavlid image data");
+					return;
+				}
+
+				using (var bmp = ImageUtil.BuildStringImage("Now playing: " + startEvent.ResourceData.ResourceTitle, bmpOrig))
 				{
 					using (var mem = new MemoryStream())
 					{
@@ -263,6 +276,7 @@ namespace TS3AudioBot
 							Log.Warn("Could not save avatar: {0}", result.Error);
 					}
 				}
+#endif
 			}
 			else
 			{

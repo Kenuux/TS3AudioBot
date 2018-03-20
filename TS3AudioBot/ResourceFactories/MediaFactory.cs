@@ -13,7 +13,6 @@ namespace TS3AudioBot.ResourceFactories
 	using Helper.AudioTags;
 	using System;
 	using System.Collections.Generic;
-	using System.Drawing;
 	using System.IO;
 	using System.Linq;
 
@@ -212,7 +211,7 @@ namespace TS3AudioBot.ResourceFactories
 			return RResultCode.MediaUnknownUri.ToString();
 		}
 
-		public R<Image> GetThumbnail(PlayResource playResource)
+		public R<Stream> GetThumbnail(PlayResource playResource)
 		{
 			byte[] rawImgData;
 
@@ -236,17 +235,7 @@ namespace TS3AudioBot.ResourceFactories
 			if (rawImgData == null)
 				return "No image found";
 
-			using (var memStream = new MemoryStream(rawImgData))
-			{
-				try
-				{
-					return new Bitmap(memStream);
-				}
-				catch (ArgumentException)
-				{
-					return "Inavlid image data";
-				}
-			}
+			return new MemoryStream(rawImgData);
 		}
 	}
 

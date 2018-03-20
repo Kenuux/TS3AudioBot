@@ -31,6 +31,7 @@ cov-int/
 cov-int.zip
 html/
 latex/
+config/
 
 # C++ Build results
 *.o
@@ -41,7 +42,6 @@ latex/
 
 # Keep precompiled libs
 !TS3AudioBot/lib/**/*
-!TS3Client/lib/**/*
 
 # Roslyn cache directories
 *.ide/

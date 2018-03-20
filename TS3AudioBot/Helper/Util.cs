@@ -62,11 +62,15 @@ namespace TS3AudioBot.Helper
 			{
 				try
 				{
+#if NET46
 					using (var user = WindowsIdentity.GetCurrent())
 					{
 						var principal = new WindowsPrincipal(user);
 						return principal.IsInRole(WindowsBuiltInRole.Administrator);
 					}
+#else
+					return false;
+#endif
 				}
 				catch (UnauthorizedAccessException) { return false; }
 				catch (Exception)

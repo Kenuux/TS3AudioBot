@@ -7,6 +7,8 @@
 // You should have received a copy of the Open Software License along with this
 // program. If not, see <https://opensource.org/licenses/OSL-3.0>.
 
+#if NET46
+
 namespace TS3AudioBot.Helper
 {
 	using Environment;
@@ -45,7 +47,7 @@ namespace TS3AudioBot.Helper
 						graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
 						graphics.CompositingQuality = CompositingQuality.HighQuality;
 
-						using (Pen avatarTextOutline = new Pen(Color.Black, 4) { LineJoin = LineJoin.Round })
+						using (var avatarTextOutline = new Pen(Color.Black, 4) { LineJoin = LineJoin.Round })
 						{
 							graphics.DrawPath(avatarTextOutline, gp);
 						}
@@ -134,7 +136,7 @@ namespace TS3AudioBot.Helper
 						gp.AddString(part, FontFamily.GenericMonospace, 0, 15, buildRect, AvatarTextFormat);
 
 						bg.Clear(Color.Transparent);
-						using (Pen avatarTextOutline = new Pen(Color.Black, 4) { LineJoin = LineJoin.Round })
+						using (var avatarTextOutline = new Pen(Color.Black, 4) { LineJoin = LineJoin.Round })
 						{
 							bg.DrawPath(avatarTextOutline, gp);
 						}
@@ -147,3 +149,5 @@ namespace TS3AudioBot.Helper
 		}
 	}
 }
+
+#endif
