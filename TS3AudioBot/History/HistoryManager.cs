@@ -297,10 +297,10 @@ namespace TS3AudioBot.History
 	public class HistoryManagerData : ConfigData
 	{
 		[Info("Allows to enable or disable history features completely to save resources.", "true")]
-		public bool EnableHistory { get; set; }
+		public bool EnableHistory { get => Get<bool>(); set => Set(value); }
 		[Info("The Path to the history database file", "history.db")]
-		public string HistoryFile { get; set; }
+		public string HistoryFile { get => Get<string>(); set => Set(value); }
 		[Info("Whether or not deleted history ids should be filled up with new songs", "true")]
-		public bool FillDeletedIds { get; set; }
+		public bool FillDeletedIds { get => Get<bool>(); set => Set(value); }
 	}
 }

@@ -9,14 +9,13 @@
 
 namespace TS3AudioBot.Helper
 {
-	using PropertyChanged;
 	using System;
 	using System.Collections.Generic;
 	using System.ComponentModel;
 	using System.Globalization;
 	using System.IO;
-	using System.Reflection;
 	using System.Linq;
+	using System.Reflection;
 
 	public abstract class ConfigFile
 	{
@@ -136,7 +135,7 @@ namespace TS3AudioBot.Helper
 			{
 				return "The value could not be parsed";
 			}
-			prop.SetValue(co, convertedValue);
+			co.SetUnsafe(prop.Name, convertedValue);
 			WriteValueToConfig(key, convertedValue);
 			return R.OkR;
 		}
@@ -256,8 +255,11 @@ namespace TS3AudioBot.Helper
 					return;
 
 				string key = cd.AssociatedClass + NameSeperator + e.PropertyName;
-				var property = cd.GetType().GetProperty(e.PropertyName);
-				WriteValueToConfig(key, property.GetValue(cd));
+
+				if (cd.TryGet(e.PropertyName, out var propValue))
+					WriteValueToConfig(key, propValue);
+				else
+					throw new InvalidOperationException($"No config entry with this value found '{e.PropertyName}'");
 			}
 
 			public override void Close()
@@ -345,11 +347,32 @@ namespace TS3AudioBot.Helper
 
 	// disable 'event is never used' since fody generates the usage for us
 #pragma warning disable CS0067
-	public class ConfigData : INotifyPropertyChanged
+	public class ConfigData
 	{
-		[DoNotNotify]
 		internal string AssociatedClass { get; set; }
-		public event PropertyChangedEventHandler PropertyChanged;
+		private Dictionary<string, object> Values = new Dictionary<string, object>();
+		internal event PropertyChangedEventHandler PropertyChanged;
+
+		protected T Get<T>([System.Runtime.CompilerServices.CallerMemberName] string memberName = "")
+		{
+			if (Values.TryGetValue(memberName.ToUpperInvariant(), out var data))
+				return (T)data;
+			return default(T);
+		}
+
+		internal bool TryGet(string memberName, out object value) => Values.TryGetValue(memberName.ToUpperInvariant(), out value);
+
+		protected void Set<T>(T value,
+			[System.Runtime.CompilerServices.CallerMemberName] string memberName = "")
+		{
+			Values[memberName.ToUpperInvariant()] = value;
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(memberName));
+		}
+
+		internal void SetUnsafe(string memberName, object value)
+		{
+			Values[memberName.ToUpperInvariant()] = value;
+		}
 	}
 #pragma warning restore CS0067
 }

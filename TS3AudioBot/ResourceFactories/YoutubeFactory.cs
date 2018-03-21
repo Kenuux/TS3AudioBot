@@ -387,9 +387,9 @@ namespace TS3AudioBot.ResourceFactories
 	public class YoutubeFactoryData : ConfigData
 	{
 		[Info("A youtube apiv3 'Browser' type key", "AIzaSyBOqG5LUbGSkBfRUoYfUUea37-5xlEyxNs")]
-		public string ApiKey { get; set; }
+		public string ApiKey { get => Get<string>(); set => Set(value); }
 		[Info("Path to the youtube-dl binary or local git repository", "")]
-		public string YoutubedlPath { get; set; }
+		public string YoutubedlPath { get => Get<string>(); set => Set(value); }
 	}
 #pragma warning restore CS0649
 

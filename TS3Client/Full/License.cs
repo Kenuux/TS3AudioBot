@@ -55,7 +55,7 @@ namespace TS3Client.Full
 
 		public byte[] DeriveKey()
 		{
-			var round = LicenseRootKey; //Ed25519.DecodePoint(LicenseRootKey);
+			var round = LicenseRootKey;
 			foreach (var block in Blocks)
 				round = block.DeriveKey(round);
 			return round;

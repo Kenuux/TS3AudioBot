@@ -265,6 +265,6 @@ namespace TS3AudioBot.ResourceFactories
 	public class MediaFactoryData : ConfigData
 	{
 		[Info("The default path to look for local resources.", "")]
-		public string DefaultPath { get; set; }
+		public string DefaultPath { get => Get<string>(); set => Set(value); }
 	}
 }

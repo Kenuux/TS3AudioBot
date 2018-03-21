@@ -438,7 +438,7 @@ namespace TS3AudioBot
 	public class PlaylistManagerData : ConfigData
 	{
 		[Info("Path the playlist folder", "Playlists")]
-		public string PlaylistPath { get; set; }
+		public string PlaylistPath { get => Get<string>(); set => Set(value); }
 	}
 #pragma warning restore CS0649
 }
