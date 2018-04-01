@@ -1,0 +1,111 @@
+﻿// out: ../styles.css
+/* <pre> */
+/* ReSharper disable All */
+
+@import "styles_button";
+@import "styles_playcontrols";
+@import "styles_slider";
+@import "styles_history";
+@import "styles_authbox";
+
+@backgroundcolor1: #050505;
+@backgroundcolor2: #202020;
+@foregroundcolor1: #B0171F;
+@foregroundcolor2: #FF6103;
+@contrastcolor1: #B2B2B2;
+@top-off: 40px;
+@left-off: 150px;
+@bot-off: 25px;
+@shadow: 3px 3px 3px 0px @backgroundcolor1;
+
+html, body {
+	background-color: @backgroundcolor1;
+	color: @foregroundcolor2;
+	margin: 0;
+	font-family: Verdana;
+}
+
+h1 {
+	text-align: center;
+	margin: 0;
+}
+
+h2 {
+	text-align: center;
+}
+
+header {
+	color: white;
+	position: fixed;
+	width: 100%;
+	height: @top-off;
+}
+
+nav {
+	top: @top-off;
+	bottom: @bot-off; 
+	width: @left-off;
+	position: fixed;
+	line-height: 2em;
+	background-color: @backgroundcolor1;
+}
+
+section {
+	top: @top-off;
+	left: @left-off;
+	bottom: @bot-off;
+	right: 0;
+	position: fixed;
+	background-color: @backgroundcolor2;
+	overflow-y: auto;
+	overflow-x: auto;
+	z-index: -1;
+}
+
+footer {
+	bottom: 0;
+	height: @bot-off;
+	width: 100%;
+	color: white;
+	text-align: center;
+	position: fixed;
+}
+
+.maxheight {
+	height: 100%;
+}
+
+.split3 {
+	display: flex;
+}
+
+.split3bit {
+	width: 33.3%;
+	min-width: 0%;
+}
+
+.split3max {
+	width: 100.0%;
+	min-width: 0%;
+}
+
+.flowright {
+	display: flex;
+	justify-content: flex-end;
+
+	> * {
+		margin-right: 0.5em;
+	}
+}
+
+.unselectable, nav > a {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	cursor: default;
+}
+
+/* </pre> */

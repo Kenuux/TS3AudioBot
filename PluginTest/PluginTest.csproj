@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2FDC3D2E-97BC-4B8A-82BF-84530F0E33D6}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>PluginTest</RootNamespace>
+    <AssemblyName>PluginTest</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Plugin.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TS3ABotUnitTests\TS3ABotUnitTests.csproj">
+      <Project>{20b6f767-5396-41d9-83d8-98b5730c6e2e}</Project>
+      <Name>TS3ABotUnitTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TS3AudioBot\TS3AudioBot.csproj">
+      <Project>{0ecc38f3-de6e-4d7f-81eb-58b15f584635}</Project>
+      <Name>TS3AudioBot</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Ts3ClientTests\Ts3ClientTests.csproj">
+      <Project>{3f6f11f0-c0de-4c24-b39f-4a5b5b150376}</Project>
+      <Name>Ts3ClientTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TS3Client\TS3Client.csproj">
+      <Project>{0eb99e9d-87e5-4534-a100-55d231c2b6a6}</Project>
+      <Name>TS3Client</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
