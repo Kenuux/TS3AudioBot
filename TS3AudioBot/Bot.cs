@@ -129,6 +129,7 @@ namespace TS3AudioBot
 				Log.Info(qcex, "There is either a problem with your connection configuration, or the query has not all permissions it needs.");
 				return "Query error";
 			}
+			Log.Info("Bot connected");
 			return R.OkR;
 		}
 
@@ -235,7 +236,7 @@ namespace TS3AudioBot
 				}
 				else
 				{
-					setString = "<Sleeping>";
+					setString = "Status: Idle";
 				}
 
 				return QueryConnection.ChangeDescription(setString);

@@ -129,15 +129,6 @@ namespace TS3AudioBot
 			return tsBaseClient.ChangeDescription(description, me.Value.ClientId).ToR(Extensions.ErrorFormat);
 		}
 
-		public string MoveChannel(ulong channelid)
-		{
-			var me = GetSelf();
-			if (!me.Ok)
-				return "Internal error (me==null)";
-			tsBaseClient.ClientMove(me.Value.ClientId, channelid);
-			return "success";
-		}
-
 		public R ChangeBadges(string badgesString) => tsBaseClient.ChangeBadges(badgesString).ToR(Extensions.ErrorFormat);
 
 		public R ChangeName(string name)

@@ -20,6 +20,7 @@ namespace TS3AudioBot
 	using Rights;
 	using Sessions;
 	using System;
+	using System.Collections.Generic;
 	using System.Threading;
 	using Web;
 
@@ -149,13 +150,24 @@ namespace TS3AudioBot
 			// END TODO
 			ConfigManager.Close();
 
-			Log.Info("[============ TS3AudioBot started =============]");
-			Log.Info("[=== Date/Time: {0} {1}", DateTime.Now.ToLongDateString(), DateTime.Now.ToLongTimeString());
-			Log.Info("[=== Version: {0}", SystemData.AssemblyData);
-			Log.Info("[=== Platform: {0}", SystemData.PlattformData);
-			Log.Info("[=== Runtime: {0}", SystemData.RuntimeData.FullName);
-			Log.Info("[=== Opus: {0}", TS3Client.Audio.Opus.NativeMethods.Info);
-			Log.Info("[==============================================]");
+			String[] startups = {
+			" _____ _____ ___ _____       _ _     _____     _  " ,
+			"|_   _|   __|_  |  _  |_ _ _| |_|___| __  |___| |_ ",
+			"  | | |__   |_  |     | | | . | | . | __ -| . |  _|",
+			"  |_| |_____|___|__|__|___|___|_|___|_____|___|_|  " };
+
+			foreach (string startup in startups)
+			{
+				Log.Info(startup);
+			}
+
+			Log.Info(" ");
+			Log.Info("Date/Time: {0} {1}", DateTime.Now.ToLongDateString(), DateTime.Now.ToLongTimeString());
+			Log.Info("Version: {0}", SystemData.AssemblyData);
+			Log.Info("Platform: {0}", SystemData.PlattformData);
+			Log.Info("Runtime: {0}", SystemData.RuntimeData.FullName);
+			Log.Info("Opus: {0}", TS3Client.Audio.Opus.NativeMethods.Info);
+			Log.Info(" ");
 			if (SystemData.RuntimeData.Runtime == Runtime.Mono)
 			{
 				if (SystemData.RuntimeData.SemVer == null)
@@ -172,11 +184,12 @@ namespace TS3AudioBot
 				}
 			}
 
-			Log.Info("[============ Initializing Modules ============]");
 			TS3Client.Messages.Deserializer.OnError += (s, e) => Log.Error(e.ToString());
 
+			Log.Info("Initializing instances...");
 			Injector = new CoreInjector();
 
+			Log.Info("Registering types...");
 			Injector.RegisterType<Core>();
 			Injector.RegisterType<ConfigFile>();
 			Injector.RegisterType<CoreInjector>();
@@ -189,6 +202,7 @@ namespace TS3AudioBot
 			Injector.RegisterType<BotManager>();
 			Injector.RegisterType<TokenManager>();
 
+			Log.Info("Registering modules...");
 			Injector.RegisterModule(this);
 			Injector.RegisterModule(ConfigManager);
 			Injector.RegisterModule(Injector);
@@ -211,8 +225,7 @@ namespace TS3AudioBot
 					return "Could not load all core modules";
 				}
 			}
-
-			Log.Info("[==================== Done ====================]");
+			Log.Info(" ");
 			return R.OkR;
 		}
 

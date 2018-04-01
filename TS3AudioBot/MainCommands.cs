@@ -1327,6 +1327,15 @@ namespace TS3AudioBot
 				throw new CommandException("Cannot parse channelid", CommandExceptionReason.CommandError);
 			return bot.QueryConnection.MoveTo(channelid);
 		}
+
+		[Command("description", "Set the description.")]
+		[Usage("<desc>", "What?")]
+		public static string CommandDescription(Bot bot, String parameter = null)
+		{
+			if (parameter == null)
+				throw new CommandException("You need to specify channelid", CommandExceptionReason.CommandError);
+			return bot.QueryConnection.ChangeDescription(parameter);
+		}
 		// ReSharper enable UnusedMember.Global
 
 		private static Playlist AutoGetPlaylist(UserSession session, InvokerData invoker)

@@ -35,11 +35,12 @@ namespace TS3AudioBot.Dependency
 		/// <typeparam name="TModule">The type to add</typeparam>
 		public void RegisterType<TModule>() => RegisterType(typeof(TModule));
 
-		private void RegisterType(Type modType)
+		public void RegisterType(Type modType)
 		{
 			if (registeredTypes.Contains(modType))
 				return;
 			registeredTypes.Add(modType);
+			//Log.Info("Type " + modType.Name + " registered");
 		}
 
 		/// <summary>Adds an object as a new module to the module pool.
@@ -59,6 +60,7 @@ namespace TS3AudioBot.Dependency
 			var mod = new Module(module, onInit);
 			modules.Add(mod);
 			DoQueueInitialize(false);
+			//Log.Info("Module " + mod + " registered");
 		}
 
 		/// <summary>Injects all dependencies into the passe object without registering it as a new module.</summary>
